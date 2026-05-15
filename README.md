@@ -1,0 +1,1 @@
+Project made for university and personal use
