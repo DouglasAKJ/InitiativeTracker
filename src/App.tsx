@@ -11,7 +11,7 @@ import {
   RefreshCcw,
   Swords,
   Target
-} from 'lucide-react';
+} from 'lucide-react';""
 import { clsx } from 'clsx';
 import './App.css';
 
