@@ -8,12 +8,11 @@ import {
   GripVertical, 
   Skull, 
   UserPlus, 
-  RefreshCcw,
-  Swords,
-  Target
+  RefreshCcw
 } from 'lucide-react';""
 import { clsx } from 'clsx';
 import './App.css';
+import Header from './components/Header';
 
 interface Player {
   id: string;
@@ -102,14 +101,8 @@ function App() {
 
   return (
     <div className="app-container">
-      <header className="main-header">
-        <div className="header-content">
-          <Swords className="header-icon" size={40} />
-          <h1 className="medieval-title">Controlador de Iniciativas</h1>
-          <Target className="header-icon" size={40} />
-        </div>
-        <p className="subtitle">by Poug.</p>
-      </header>
+      
+      <Header />
 
       <section className="controls-panel">
         <form className="add-form" onSubmit={addPlayer}>
@@ -118,7 +111,7 @@ function App() {
             <input 
               value={name} 
               onChange={e => setName(e.target.value)} 
-              placeholder="Ex: Valerius" 
+              placeholder="Ex: Baruch, o Fidalgo" 
               required 
             />
           </div>

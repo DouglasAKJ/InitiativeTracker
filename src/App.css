@@ -70,7 +70,7 @@ body {
 
 .subtitle {
   font-family: var(--font-header);
-  font-size: 0.9rem;
+  font-size: 0.8rem;
   color: rgba(244, 228, 188, 0.6);
   margin-top: 10px;
   letter-spacing: 2px;
