@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd';
 import type { DropResult } from '@hello-pangea/dnd';
 import { 
@@ -8,8 +8,24 @@ import {
   GripVertical, 
   Skull, 
   UserPlus, 
-  RefreshCcw
-} from 'lucide-react';""
+  RefreshCcw,
+  EyeOff,
+  Heart,
+  EarOff,
+  Ghost,
+  Hand,
+  ZapOff,
+  UserMinus,
+  Zap,
+  Mountain,
+  ArrowDown,
+  Link,
+  Activity,
+  Moon,
+  BatteryLow,
+  Smile,
+  X
+} from 'lucide-react';
 import { clsx } from 'clsx';
 import './App.css';
 import Header from './components/Header';
@@ -20,7 +36,26 @@ interface Player {
   maxHp: number;
   currentHp: number;
   initiative: number;
+  conditions: string[]; // Store condition IDs
 }
+
+const CONDITIONS = [
+  { id: 'blinded', name: 'Cego', icon: EyeOff, color: '#94a3b8' },
+  { id: 'charmed', name: 'Enfeitiçado', icon: Heart, color: '#f472b6' },
+  { id: 'deafened', name: 'Surdo', icon: EarOff, color: '#94a3b8' },
+  { id: 'frightened', name: 'Amedrontado', icon: Ghost, color: '#a855f7' },
+  { id: 'grappled', name: 'Agarrado', icon: Hand, color: '#fbbf24' },
+  { id: 'incapacitated', name: 'Incapacitado', icon: ZapOff, color: '#ef4444' },
+  { id: 'invisible', name: 'Invisível', icon: UserMinus, color: '#38bdf8' },
+  { id: 'paralyzed', name: 'Paralisado', icon: Zap, color: '#ef4444' },
+  { id: 'petrified', name: 'Petrificado', icon: Mountain, color: '#64748b' },
+  { id: 'poisoned', name: 'Envenenado', icon: Skull, color: '#22c55e' },
+  { id: 'prone', name: 'Caído', icon: ArrowDown, color: '#fbbf24' },
+  { id: 'restrained', name: 'Impedido', icon: Link, color: '#fbbf24' },
+  { id: 'stunned', name: 'Atordoado', icon: Activity, color: '#ef4444' },
+  { id: 'unconscious', name: 'Inconsciente', icon: Moon, color: '#6366f1' },
+  { id: 'exhaustion', name: 'Exaustão', icon: BatteryLow, color: '#f97316' },
+];
 
 // Fallback for crypto.randomUUID if not available (non-secure context)
 const generateId = () => {
@@ -35,13 +70,32 @@ function App() {
   const [name, setName] = useState('');
   const [hp, setHp] = useState<number>(10);
   const [initiative, setInitiative] = useState<number>(10);
+  const [activePickerId, setActivePickerId] = useState<string | null>(null);
+  const pickerRef = useRef<HTMLDivElement>(null);
+
+  // Close picker when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (pickerRef.current && !pickerRef.current.contains(event.target as Node)) {
+        setActivePickerId(null);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
 
   // Load from localStorage
   useEffect(() => {
     const saved = localStorage.getItem('rpg-initiative-players');
     if (saved) {
       try {
-        setPlayers(JSON.parse(saved));
+        const parsed = JSON.parse(saved);
+        // Migration for old data structure
+        const migrated = parsed.map((p: any) => ({
+          ...p,
+          conditions: p.conditions || p.condition?.map((c: any) => c.id) || []
+        }));
+        setPlayers(migrated);
       } catch (e) {
         console.error("Failed to load players", e);
       }
@@ -63,6 +117,7 @@ function App() {
       maxHp: hp,
       currentHp: hp,
       initiative,
+      conditions: []
     };
 
     // New players go to their initiative position by default
@@ -77,6 +132,19 @@ function App() {
     setPlayers(players.map(p => 
       p.id === id ? { ...p, currentHp: Math.max(0, p.currentHp + delta) } : p
     ));
+  };
+
+  const toggleCondition = (playerId: string, conditionId: string) => {
+    setPlayers(players.map(p => {
+      if (p.id !== playerId) return p;
+      const hasCondition = p.conditions.includes(conditionId);
+      return {
+        ...p,
+        conditions: hasCondition 
+          ? p.conditions.filter(c => c !== conditionId)
+          : [...p.conditions, conditionId]
+      };
+    }));
   };
 
   const onDragEnd = (result: DropResult) => {
@@ -173,8 +241,58 @@ function App() {
                         <div className="player-identity">
                           <span className="player-name">{player.name}</span>
                           <span className="player-initiative">Inic: {player.initiative}</span>
-                        </div>
+                          <div className="player-conditions">
+                            {player.conditions.map((condId) => {
+                              const cond = CONDITIONS.find(c => c.id === condId);
+                              if (!cond) return null;
+                              const Icon = cond.icon;
+                              return (
+                                <button 
+                                  key={condId} 
+                                  className="condition-icon-btn"
+                                  onClick={() => toggleCondition(player.id, condId)}
+                                  title={cond.name}
+                                  style={{ color: cond.color }}
+                                >
+                                  <Icon size={16} />
+                                </button>
+                              );
+                            })}
+                            <button 
+                              className="btn-add-condition" 
+                              onClick={() => setActivePickerId(activePickerId === player.id ? null : player.id)}
+                              title="Adicionar Condição"
+                            >
+                              <Plus size={14} />
+                            </button>
 
+                            {activePickerId === player.id && (
+                              <div className="condition-picker" ref={pickerRef}>
+                                <div className="picker-header">
+                                  <span>Condições</span>
+                                  <button onClick={() => setActivePickerId(null)} className="btn-close-picker"><X size={14} /></button>
+                                </div>
+                                <div className="picker-grid">
+                                  {CONDITIONS.map(cond => {
+                                    const Icon = cond.icon;
+                                    const isActive = player.conditions.includes(cond.id);
+                                    return (
+                                      <button 
+                                        key={cond.id}
+                                        className={clsx("picker-item", isActive && "active")}
+                                        onClick={() => toggleCondition(player.id, cond.id)}
+                                        title={cond.name}
+                                      >
+                                        <Icon size={18} style={{ color: cond.color }} />
+                                        <span>{cond.name}</span>
+                                      </button>
+                                    );
+                                  })}
+                                </div>
+                              </div>
+                            )}
+                          </div>
+                        </div>
                         <div className="hp-system">
                           <button className="hp-btn minus" onClick={() => updateHp(player.id, -1)}>
                             <Minus size={14} />
