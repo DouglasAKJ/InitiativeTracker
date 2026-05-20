@@ -23,7 +23,6 @@ import {
   Activity,
   Moon,
   BatteryLow,
-  Smile,
   X
 } from 'lucide-react';
 import { clsx } from 'clsx';
