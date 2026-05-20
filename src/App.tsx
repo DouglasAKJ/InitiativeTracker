@@ -178,6 +178,11 @@ function App() {
                         <div className="hp-system">
                           <button className="hp-btn minus" onClick={() => updateHp(player.id, -1)}>
                             <Minus size={14} />
+                            <p>-1</p>
+                          </button>
+                          <button className="hp-btn-10 minus" onClick={() => updateHp(player.id, -10)}>
+                            <Minus size={14} />
+                            <p>-10</p>
                           </button>
                           
                           <div className="hp-meter">
@@ -198,8 +203,13 @@ function App() {
                             </div>
                           </div>
 
-                          <button className="hp-btn plus" onClick={() => updateHp(player.id, 1)}>
+                          <button className="hp-btn-10 plus" onClick={() => updateHp(player.id, 10)}>
                             <Plus size={14} />
+                            <p>+10</p>
+                          </button>
+                          <button  className="hp-btn plus" onClick={() => updateHp(player.id, 1)}>
+                            <Plus size={14} />
+                            <p>+1</p>
                           </button>
                         </div>
                       </div>
