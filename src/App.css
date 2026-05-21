@@ -236,6 +236,10 @@ body {
   z-index: 100;
 }
 
+.player-card.active-picker {
+  z-index: 1001;
+}
+
 .drag-handle {
   color: rgba(212, 175, 55, 0.3);
   cursor: grab;

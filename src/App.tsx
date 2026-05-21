@@ -230,7 +230,7 @@ function App() {
                     <div
                       ref={provided.innerRef}
                       {...provided.draggableProps}
-                      className={clsx('player-card', snapshot.isDragging && 'dragging')}
+                      className={clsx('player-card', snapshot.isDragging && 'dragging', activePickerId === player.id && 'active-picker')}
                     >
                       <div {...provided.dragHandleProps} className="drag-handle">
                         <GripVertical size={20} />
