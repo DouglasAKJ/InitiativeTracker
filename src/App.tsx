@@ -23,7 +23,8 @@ import {
   Activity,
   Moon,
   BatteryLow,
-  X
+  X,
+  Eye
 } from 'lucide-react';
 import { clsx } from 'clsx';
 import './App.css';
@@ -39,21 +40,21 @@ interface Player {
 }
 
 const CONDITIONS = [
-  { id: 'blinded', name: 'Cego', icon: EyeOff, color: '#94a3b8' },
-  { id: 'charmed', name: 'Enfeitiçado', icon: Heart, color: '#f472b6' },
-  { id: 'deafened', name: 'Surdo', icon: EarOff, color: '#94a3b8' },
-  { id: 'frightened', name: 'Amedrontado', icon: Ghost, color: '#a855f7' },
-  { id: 'grappled', name: 'Agarrado', icon: Hand, color: '#fbbf24' },
-  { id: 'incapacitated', name: 'Incapacitado', icon: ZapOff, color: '#ef4444' },
-  { id: 'invisible', name: 'Invisível', icon: UserMinus, color: '#38bdf8' },
-  { id: 'paralyzed', name: 'Paralisado', icon: Zap, color: '#ef4444' },
-  { id: 'petrified', name: 'Petrificado', icon: Mountain, color: '#64748b' },
-  { id: 'poisoned', name: 'Envenenado', icon: Skull, color: '#22c55e' },
-  { id: 'prone', name: 'Caído', icon: ArrowDown, color: '#fbbf24' },
-  { id: 'restrained', name: 'Impedido', icon: Link, color: '#fbbf24' },
-  { id: 'stunned', name: 'Atordoado', icon: Activity, color: '#ef4444' },
-  { id: 'unconscious', name: 'Inconsciente', icon: Moon, color: '#6366f1' },
-  { id: 'exhaustion', name: 'Exaustão', icon: BatteryLow, color: '#f97316' },
+  { id: 'blinded', name: 'Cego', description: 'Uma criatura cega não consegue ver e falha automaticamente em qualquer teste de habilidade que exija visão. As jogadas de ataque contra a criatura têm vantagem, e as jogadas de ataque da criatura têm desvantagem.', icon: EyeOff, color: '#94a3b8' },
+  { id: 'charmed', name: 'Encantado', description: 'Uma criatura encantada não pode atacar o encantador nem atacá-lo com habilidades prejudiciais ou efeitos mágicos. O encantador tem vantagem em qualquer teste de habilidade para interagir socialmente com a criatura.', icon: Heart, color: '#f472b6' },
+  { id: 'deafened', name: 'Surdo', description: 'Uma criatura surda não consegue ouvir e falha automaticamente em qualquer teste de habilidade que exija audição.', icon: EarOff, color: '#94a3b8' },
+  { id: 'frightened', name: 'Amedrontado', description: 'Uma criatura amedrontada tem desvantagem em testes de  habilidade e testes de ataque, enquanto a fonte de seu medo está dentro da linha de visão. A criatura não pode se aproximar voluntariamente da fonte de seu medo.', icon: Ghost, color: '#a855f7' },
+  { id: 'grappled', name: 'Agarrado', description: 'A velocidade de uma criatura agarrada torna-se 0, e ela não pode se beneficiar de nenhum bônus em sua velocidade. A condição termina se o agarrador estiver incapacitado (veja a condição). A condição também termina se um efeito remover a criatura agarrada do alcance do agarrador ou efeito de agarrar, como quando uma criatura é arremessada para longe pelo feitiço da onda de trovão.', icon: Hand, color: '#fbbf24' },
+  { id: 'incapacitated', name: 'Incapacitado', description: 'Uma criatura incapacitada não pode tomar ações ou reações.', icon: ZapOff, color: '#ef4444' },
+  { id: 'invisible', name: 'Invisível', description: 'É impossível ver uma criatura invisível sem a ajuda de magia ou de um sentido especial. Com o propósito de se esconder, a criatura fica fortemente obscurecida. A localização da criatura pode ser detectada por qualquer ruído que ela faça ou por quaisquer rastros que ela deixe. As jogadas de ataque contra a criatura têm  desvantagem, e as jogadas de ataque da criatura têm  vantagem.', icon: UserMinus, color: '#38bdf8' },
+  { id: 'paralyzed', name: 'Paralisado', description: 'Uma criatura paralisada fica incapacitada (veja a condição) e não consegue se mover ou falar. A criatura falha automaticamente nos salva-guardas de Força e Destreza. Rolagens de ataque contra a criatura têm  vantagem. Qualquer ataque que atinja a criatura é um golpe crítico se o atacante estiver a 1,5 metro da criatura. ', icon: Zap, color: '#ef4444' },
+  { id: 'petrified', name: 'Petrificado', description: 'Uma criatura petrificada é transformada, junto com qualquer objeto não mágico que esteja vestindo ou carregando, em uma substância sólida inanimada (geralmente pedra). Seu peso aumenta por um fator de dez e cessa o envelhecimento. A criatura está incapacitada (veja a condição), não consegue se mover ou falar e não tem consciência do que a cerca. Rolagens de ataque contra a criatura têm  vantagem. A criatura falha automaticamente nos salva-guardas de Força e Destreza. A criatura tem resistência a todo dano. A criatura é imune a venenos e doenças, embora um veneno ou doença já presente em seu organismo está suspenso, não neutralizado.', icon: Mountain, color: '#64748b' },
+  { id: 'poisoned', name: 'Envenenado', description: 'Uma criatura envenenada tem desvantagem em testes de ataque e testes de habilidade.', icon: Skull, color: '#22c55e' },
+  { id: 'prone', name: 'Caído', description: 'A única opção de movimento de uma criatura propensa é rastejar, a menos que ela se levante e, assim, acabe com a condição. A criatura tem  desvantagem em  testes de ataque. Uma jogada  de ataque contra a criatura tem  vantagem se o atacante estiver a 1,5 metro da criatura. Caso contrário, a jogada de ataque tem  desvantagem.',  icon: ArrowDown, color: '#fbbf24' },
+  { id: 'restrained', name: 'Impedido', description: 'A velocidade de uma criatura impedida se torna 0, e ela não pode se beneficiar de nenhum bônus em sua velocidade. As jogadas de ataque contra a criatura têm  vantagem, e as jogadas de ataque da criatura têm  desvantagem. A criatura tem desvantagem em arremess os que salvam Destreza.', icon: Link, color: '#fbbf24' },
+  { id: 'stunned', name: 'Atordoado', description: 'Uma criatura atordoada fica incapacitada (veja a condição), não consegue se mover e só consegue falar vacilantemente. A criatura falha automaticamente nos arremess os que salvam Força e Destreza. Rolagens de ataque contra a criatura têm  vantagem.', icon: Activity, color: '#ef4444' },
+  { id: 'unconscious', name: 'Inconsciente', description: 'Uma criatura inconsciente está incapacitada (veja a condição), não consegue se mover ou falar e não tem consciência do que está ao seu redor. A criatura deixa cair tudo o que está segurando e cai de bruços. A criatura falha automaticamente nos salva-guardas de Força e Destreza. Rolagens de ataque contra a criatura têm  vantagem. Qualquer ataque que atinja a criatura é um golpe crítico se o atacante estiver a 1,5 metro da criatura.', icon: Moon, color: '#6366f1' },
+  { id: 'exhaustion', name: 'Exaustão', description: 'Uma criatura pode sofrer seis níveis de exaustão. Cada nível concede um efeito cumulativo: 1. Desvantagem em testes de habilidade; 2. Deslocamento reduzido à metade; 3. Desvantagem em jogadas de ataque e salvaguardas; 4. Máximo de pontos de vida reduzido à metade; 5. Deslocamento reduzido a 0; 6. Morte.', icon: BatteryLow, color: '#f97316' },
 ];
 
 // Fallback for crypto.randomUUID if not available (non-secure context)
@@ -72,6 +73,17 @@ function App() {
   const [activePickerId, setActivePickerId] = useState<string | null>(null);
   const pickerRef = useRef<HTMLDivElement>(null);
 
+  const [hoveredCondition, setHoveredCondition] = useState<{
+    name: string;
+    description: string;
+    x: number;
+    y: number;
+    showTooltip: boolean;
+  } | null>(null);
+  const hoverTimerRef = useRef<number | null>(null);
+  const tooltipRef = useRef<HTMLDivElement>(null);
+  const [tooltipStyle, setTooltipStyle] = useState<React.CSSProperties>({ visibility: 'hidden' });
+
   // Close picker when clicking outside
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -82,6 +94,67 @@ function App() {
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
+
+  // Tooltip dynamic positioning
+  useEffect(() => {
+    if (hoveredCondition?.showTooltip && tooltipRef.current) {
+      const rect = tooltipRef.current.getBoundingClientRect();
+      const padding = 20;
+      const winW = window.innerWidth;
+      const winH = window.innerHeight;
+
+      let nx = hoveredCondition.x + padding;
+      let ny = hoveredCondition.y + padding;
+
+      // Check right boundary
+      if (nx + rect.width > winW) {
+        nx = hoveredCondition.x - rect.width - padding;
+      }
+      // Check bottom boundary
+      if (ny + rect.height > winH) {
+        ny = hoveredCondition.y - rect.height - padding;
+      }
+
+      // Ensure it doesn't go off left or top
+      nx = Math.max(padding, nx);
+      ny = Math.max(padding, ny);
+
+      setTooltipStyle({
+        left: nx,
+        top: ny,
+        visibility: 'visible'
+      });
+    } else {
+      setTooltipStyle({ visibility: 'hidden' });
+    }
+  }, [hoveredCondition?.showTooltip, hoveredCondition?.x, hoveredCondition?.y]);
+
+  const handleConditionMouseEnter = (e: React.MouseEvent, cond: typeof CONDITIONS[0]) => {
+    const { clientX, clientY } = e;
+    setHoveredCondition({
+      name: cond.name,
+      description: cond.description || '',
+      x: clientX,
+      y: clientY,
+      showTooltip: false
+    });
+
+    if (hoverTimerRef.current) window.clearTimeout(hoverTimerRef.current);
+    
+    hoverTimerRef.current = window.setTimeout(() => {
+      setHoveredCondition(prev => prev ? { ...prev, showTooltip: true } : null);
+    }, 2000);
+  };
+
+  const handleConditionMouseMove = (e: React.MouseEvent) => {
+    const { clientX, clientY } = e;
+    setHoveredCondition(prev => prev ? { ...prev, x: clientX, y: clientY } : null);
+  };
+
+  const handleConditionMouseLeave = () => {
+    if (hoverTimerRef.current) window.clearTimeout(hoverTimerRef.current);
+    setHoveredCondition(null);
+  };
 
   // Load from localStorage
   useEffect(() => {
@@ -250,7 +323,9 @@ function App() {
                                   key={condId} 
                                   className="condition-icon-btn"
                                   onClick={() => toggleCondition(player.id, condId)}
-                                  title={cond.name}
+                                  onMouseEnter={(e) => handleConditionMouseEnter(e, cond)}
+                                  onMouseMove={handleConditionMouseMove}
+                                  onMouseLeave={handleConditionMouseLeave}
                                   style={{ color: cond.color }}
                                 >
                                   <Icon size={16} />
@@ -280,7 +355,9 @@ function App() {
                                         key={cond.id}
                                         className={clsx("picker-item", isActive && "active")}
                                         onClick={() => toggleCondition(player.id, cond.id)}
-                                        title={cond.name}
+                                        onMouseEnter={(e) => handleConditionMouseEnter(e, cond)}
+                                        onMouseMove={handleConditionMouseMove}
+                                        onMouseLeave={handleConditionMouseLeave}
                                       >
                                         <Icon size={18} style={{ color: cond.color }} />
                                         <span>{cond.name}</span>
@@ -343,6 +420,33 @@ function App() {
           )}
         </Droppable>
       </DragDropContext>
+
+      {hoveredCondition && (
+        <>
+          <div 
+            className="cursor-indicator"
+            style={{ 
+              left: hoveredCondition.x + 12, 
+              top: hoveredCondition.y + 12 
+            }}
+          >
+            <Eye size={18} />
+          </div>
+          
+          {hoveredCondition.showTooltip && (
+            <div 
+              ref={tooltipRef}
+              className="condition-description-tooltip"
+              style={tooltipStyle}
+            >
+              <div className="tooltip-header">
+                <strong>{hoveredCondition.name}</strong>
+              </div>
+              <p>{hoveredCondition.description}</p>
+            </div>
+          )}
+        </>
+      )}
     </div>
   );
 }
